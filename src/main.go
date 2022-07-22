@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/gen2brain/beeep"
 	spotifyauth "github.com/zmb3/spotify/v2/auth"
 
 	"github.com/zmb3/spotify/v2"
@@ -59,6 +60,7 @@ func main() {
 
 	url := auth.AuthURL(state)
 	fmt.Println("Please log in to Spotify by visiting the following page in your browser:", url)
+	err := beeep.Alert("Spotify Set Operations", "Login required: "+url, "")
 
 	// wait for auth to complete
 	client := <-ch
