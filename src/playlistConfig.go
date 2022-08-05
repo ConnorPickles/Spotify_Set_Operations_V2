@@ -28,6 +28,9 @@ func loadPlaylistConfig(playlistName string) PlaylistConfig {
 	if err != nil {
 		log.Fatal(err)
 	}
+	if (playlistConfig.Operation < 0 || playlistConfig.Operation > 2) {
+		log.Fatal("Invalid operation. Must be 0, 1, or 2 (Intersection, Union, Difference).")
+	}
 	playlistConfig.setDescriptionFromOperation()
 	return playlistConfig
 }
