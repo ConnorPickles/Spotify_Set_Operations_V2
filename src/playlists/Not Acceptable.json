@@ -1,0 +1,9 @@
+{
+    "playlist1_name": "All Songs",
+    "playlist2_name": "Acceptable",
+    "set_public": false,
+    "use_explicit": true,
+    "operation": 2,
+    "description": "All the songs I don't think other people would want to listen to",
+    "image": "thumbs_down.jpeg"
+}
