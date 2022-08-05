@@ -18,39 +18,39 @@ type PlaylistConfig struct {
 }
 
 func loadPlaylistConfig(playlistName string) PlaylistConfig {
-	var config PlaylistConfig
+	var playlistConfig PlaylistConfig
 	playlistName += ".json"
 	data, err := os.ReadFile("playlists/" + playlistName)
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = json.Unmarshal(data, &config)
+	err = json.Unmarshal(data, &playlistConfig)
 	if err != nil {
 		log.Fatal(err)
 	}
-	config.setDescriptionFromOperation()
-	return config
+	playlistConfig.setDescriptionFromOperation()
+	return playlistConfig
 }
 
 func createPringleConfig(playlistName string) PlaylistConfig {
-	config := loadPlaylistConfig("Pringle")
-	config.Playlist1Name = playlistName
-	config.Description += "\"" + playlistName + "\""
-	return config
+	playlistConfig := loadPlaylistConfig("Pringle")
+	playlistConfig.Playlist1Name = playlistName
+	playlistConfig.Description += "\"" + playlistName + "\""
+	return playlistConfig
 }
 
-func (config *PlaylistConfig) setDescriptionFromOperation() {
-	if config.Description != "" {
+func (playlistConfig *PlaylistConfig) setDescriptionFromOperation() {
+	if playlistConfig.Description != "" {
 		return
 	}
 	
-	config.Description += "This playlist contains all songs that are in "
-	switch config.Operation {
+	playlistConfig.Description += "This playlist contains all songs that are in "
+	switch playlistConfig.Operation {
 		case Intersection:
-			config.Description += fmt.Sprintf("\"%s\" and \"%s\"", config.Playlist1Name, config.Playlist2Name)
+			playlistConfig.Description += fmt.Sprintf("\"%s\" and \"%s\"", playlistConfig.Playlist1Name, playlistConfig.Playlist2Name)
 		case Union:
-			config.Description += fmt.Sprintf("\"%s\" or \"%s\"", config.Playlist1Name, config.Playlist2Name)
+			playlistConfig.Description += fmt.Sprintf("\"%s\" or \"%s\"", playlistConfig.Playlist1Name, playlistConfig.Playlist2Name)
 		case Difference:
-			config.Description += fmt.Sprintf("\"%s\" but not \"%s\"", config.Playlist1Name, config.Playlist2Name)
+			playlistConfig.Description += fmt.Sprintf("\"%s\" but not \"%s\"", playlistConfig.Playlist1Name, playlistConfig.Playlist2Name)
 	}
 }

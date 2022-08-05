@@ -1,6 +1,8 @@
 {
-    "names": [
+    "duplicate_songs": [
         "Billionaire (feat. Bruno Mars)",
         "I Love It (feat. Charli XCX)"
-    ]
+    ],
+    "update_order": [],
+    "exclude_from_all": []
 }

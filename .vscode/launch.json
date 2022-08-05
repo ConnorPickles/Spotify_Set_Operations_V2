@@ -12,8 +12,9 @@
             "program": "${fileDirname}",
             "args": [
                 "create",
-                "Spotify Only",
+                "Pringle Power Ballads",
             ],
+            "cwd": "${workspaceFolder}",
         }
     ]
 }

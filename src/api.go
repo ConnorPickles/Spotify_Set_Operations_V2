@@ -56,8 +56,8 @@ func getTracks(client *spotify.Client, playlistID spotify.ID) []spotify.SimpleTr
 	return convertToSimpleTracks(results)
 }
 
-func createNewPlaylist(client *spotify.Client, config PlaylistConfig, userID string, playlistName string) spotify.ID {
-	playlist, err := client.CreatePlaylistForUser(context.Background(), userID, playlistName, config.Description, config.SetPublic, false)
+func createNewPlaylist(client *spotify.Client, playlistConfig PlaylistConfig, userID string, playlistName string) spotify.ID {
+	playlist, err := client.CreatePlaylistForUser(context.Background(), userID, playlistName, playlistConfig.Description, playlistConfig.SetPublic, false)
 	if err != nil {
 		log.Fatal(err)
 	}

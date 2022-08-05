@@ -26,26 +26,26 @@ func main() {
 }
 
 func createPlaylist(client *spotify.Client, userID string, playlistName string) {
-	var config PlaylistConfig
+	var playlistConfig PlaylistConfig
 	if os.Args[2] == "Pringle" {
 		if (len(os.Args) < 4) {
 			fmt.Println("Usage: spotify_set_operations [update|create] Pringle <playlist_name>")
 			os.Exit(1)
 		}
-		config = createPringleConfig(os.Args[3])
+		playlistConfig = createPringleConfig(os.Args[3])
 		playlistName = "Pringle " + os.Args[3]
 	} else {
-		config = loadPlaylistConfig(playlistName)
+		playlistConfig = loadPlaylistConfig(playlistName)
 	}
 		
 	allPlaylists := getAllPlaylists(client, userID)
-	playlistID1 := getPlaylistIDFromName(allPlaylists, config.Playlist1Name)
-	playlistID2 := getPlaylistIDFromName(allPlaylists, config.Playlist2Name)
+	playlistID1 := getPlaylistIDFromName(allPlaylists, playlistConfig.Playlist1Name)
+	playlistID2 := getPlaylistIDFromName(allPlaylists, playlistConfig.Playlist2Name)
 	tracks1 := getTracks(client, playlistID1)
 	tracks2 := getTracks(client, playlistID2)
-	tracksToAdd := executeOperation(config.Operation, nil, tracks1, tracks2, config.UseExplicit)
+	tracksToAdd := executeOperation(playlistConfig.Operation, nil, tracks1, tracks2, playlistConfig.UseExplicit)
 	
-	playlist := createNewPlaylist(client, config, userID, playlistName)
-	setPlaylistImage(client, playlist, config.Image)
+	playlist := createNewPlaylist(client, playlistConfig, userID, playlistName)
+	setPlaylistImage(client, playlist, playlistConfig.Image)
 	addTracksToPlaylist(client, playlist, tracksToAdd)
 }
