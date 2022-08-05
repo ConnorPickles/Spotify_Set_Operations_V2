@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"log"
 	"os"
 
 	"github.com/zmb3/spotify/v2"
@@ -15,7 +14,7 @@ func getAllPlaylists(client *spotify.Client, userID string) []spotify.SimplePlay
 	var results []spotify.SimplePlaylist
 	playlists, err := client.GetPlaylistsForUser(context.Background(), userID)
 	if err != nil {
-		log.Fatal(err)
+		logFatalAndAlert(err)
 	}
 	results = append(results, playlists.Playlists...)
 	
@@ -25,7 +24,7 @@ func getAllPlaylists(client *spotify.Client, userID string) []spotify.SimplePlay
 			break
 		}
 		if err != nil {
-			log.Fatal(err)
+			logFatalAndAlert(err)
 		}
 		results = append(results, playlists.Playlists...)
 	}
@@ -38,7 +37,7 @@ func getTracks(client *spotify.Client, playlistID spotify.ID) []spotify.SimpleTr
 	var results []spotify.PlaylistItem
 	tracks, err := client.GetPlaylistItems(context.Background(), playlistID)
 	if err != nil {
-		log.Fatal(err)
+		logFatalAndAlert(err)
 	}
 	results = append(results, tracks.Items...)
 	
@@ -48,7 +47,7 @@ func getTracks(client *spotify.Client, playlistID spotify.ID) []spotify.SimpleTr
 			break
 		}
 		if err != nil {
-			log.Fatal(err)
+			logFatalAndAlert(err)
 		}
 		results = append(results, tracks.Items...)
 	}
@@ -59,7 +58,7 @@ func getTracks(client *spotify.Client, playlistID spotify.ID) []spotify.SimpleTr
 func createNewPlaylist(client *spotify.Client, playlistConfig PlaylistConfig, userID string, playlistName string) spotify.ID {
 	playlist, err := client.CreatePlaylistForUser(context.Background(), userID, playlistName, playlistConfig.Description, playlistConfig.SetPublic, false)
 	if err != nil {
-		log.Fatal(err)
+		logFatalAndAlert(err)
 	}
 	return playlist.ID
 }
@@ -71,13 +70,13 @@ func setPlaylistImage(client *spotify.Client, playlist spotify.ID, image string)
 	
 	r, err := os.Open("playlists/images/" + image)
 	if err != nil {
-		log.Fatal(err)
+		logFatalAndAlert(err)
 	}
 	defer r.Close()
 	
 	err = client.SetPlaylistImage(context.Background(), playlist, r)
 	if err != nil {
-		log.Fatal(err)
+		logFatalAndAlert(err)
 	}
 }
 
@@ -93,7 +92,7 @@ func addTracksToPlaylist(client *spotify.Client, playlistID spotify.ID, tracks [
 		
 		_, err := client.AddTracksToPlaylist(context.Background(), playlistID, currTracks...)
 		if err != nil {
-			log.Fatal(err)
+			logFatalAndAlert(err)
 		}
 	}
 }
@@ -108,7 +107,7 @@ func getPlaylistIDFromName(playlists []spotify.SimplePlaylist, playlistName stri
 			return playlist.ID
 		}
 	}
-	log.Fatal("Could not find playlist " + playlistName)
+	logFatalAndAlert("Could not find playlist " + playlistName)
 	return ""
 }
 

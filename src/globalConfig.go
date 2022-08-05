@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"log"
 	"os"
 )
 
@@ -17,11 +16,11 @@ var globalConfig GlobalConfig
 func init() {
 	data, err := os.ReadFile("config.json")
 	if err != nil {
-		log.Fatal(err)
+		logFatalAndAlert(err)
 	}
 
 	err = json.Unmarshal(data, &globalConfig)
 	if err != nil {
-		log.Fatal(err)
+		logFatalAndAlert(err)
 	}
 }

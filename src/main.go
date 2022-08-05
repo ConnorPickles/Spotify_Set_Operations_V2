@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/gen2brain/beeep"
 	"github.com/zmb3/spotify/v2"
 )
 
@@ -19,7 +20,7 @@ func main() {
 	client := authenticate()
 	user, err := client.CurrentUser(context.Background())
 	if err != nil {
-		log.Fatal(err)
+		logFatalAndAlert(err)
 	}
 	
 	createPlaylist(client, user.ID, os.Args[2])
@@ -48,4 +49,9 @@ func createPlaylist(client *spotify.Client, userID string, playlistName string) 
 	playlist := createNewPlaylist(client, playlistConfig, userID, playlistName)
 	setPlaylistImage(client, playlist, playlistConfig.Image)
 	addTracksToPlaylist(client, playlist, tracksToAdd)
+}
+
+func logFatalAndAlert(v ...any) {
+	beeep.Alert("Spotify Set Operations", fmt.Sprint(v...), "")
+	log.Fatal(v...)
 }

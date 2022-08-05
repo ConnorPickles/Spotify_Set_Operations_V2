@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 )
 
@@ -22,14 +21,14 @@ func loadPlaylistConfig(playlistName string) PlaylistConfig {
 	playlistName += ".json"
 	data, err := os.ReadFile("playlists/" + playlistName)
 	if err != nil {
-		log.Fatal(err)
+		logFatalAndAlert(err)
 	}
 	err = json.Unmarshal(data, &playlistConfig)
 	if err != nil {
-		log.Fatal(err)
+		logFatalAndAlert(err)
 	}
 	if (playlistConfig.Operation < 0 || playlistConfig.Operation > 2) {
-		log.Fatal("Invalid operation. Must be 0, 1, or 2 (Intersection, Union, Difference).")
+		logFatalAndAlert("Invalid operation. Must be 0, 1, or 2 (Intersection, Union, Difference).")
 	}
 	playlistConfig.setDescriptionFromOperation()
 	return playlistConfig

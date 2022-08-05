@@ -37,7 +37,7 @@ func init() {
 	const clientId = "2f364f15087c4793886f0da1a331b2e8"
 	arr, err := os.ReadFile("client_secret.txt")
 	if err != nil {
-		log.Fatal(err)
+		logFatalAndAlert(err)
 	}
 	clientSecret := string(arr)
 	
@@ -64,7 +64,7 @@ func login() *spotify.Client{
 	go func() {
 		err := server.ListenAndServe()
 		if err != nil {
-			log.Fatal(err)
+			logFatalAndAlert(err)
 		}
 	}()
 
@@ -78,7 +78,7 @@ func login() *spotify.Client{
 	// use the client to make calls that require authorization
 	user, err := client.CurrentUser(context.Background())
 	if err != nil {
-		log.Fatal(err)
+		logFatalAndAlert(err)
 	}
 	fmt.Println("You are logged in as:", user.ID)
 	
@@ -92,11 +92,11 @@ func completeAuth(w http.ResponseWriter, r *http.Request) {
 	tok, err := auth.Token(r.Context(), state, r)
 	if err != nil {
 		http.Error(w, "Couldn't get token", http.StatusForbidden)
-		log.Fatal(err)
+		logFatalAndAlert(err)
 	}
 	if st := r.FormValue("state"); st != state {
 		http.NotFound(w, r)
-		log.Fatalf("State mismatch: %s != %s\n", st, state)
+		logFatalAndAlert("State mismatch: %s != %s\n", st, state)
 	}
 
 	// use the token to get an authenticated client
