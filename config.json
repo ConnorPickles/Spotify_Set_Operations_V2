@@ -3,6 +3,12 @@
         "Billionaire (feat. Bruno Mars)",
         "I Love It (feat. Charli XCX)"
     ],
-    "update_order": [],
-    "exclude_from_all": []
+    "update_order": [
+        "Acceptable",
+        "Pringle Energetic"
+    ],
+    "exclude_from_all": [
+        "template.json",
+        "Pringle.json"
+    ]
 }
