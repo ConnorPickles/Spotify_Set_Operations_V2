@@ -12,7 +12,6 @@
     ],
     "exclude_from_all": [
         "images",
-        "template.json",
-        "Pringle.json"
+        "template.json"
     ]
 }

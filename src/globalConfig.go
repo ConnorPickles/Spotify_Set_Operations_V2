@@ -24,6 +24,10 @@ func init() {
 	if err != nil {
 		logFatalAndAlert(err)
 	}
+	
+	for _, category := range globalConfig.Categories {
+		globalConfig.ExcludeFromAll = append(globalConfig.ExcludeFromAll, category + ".json")
+	}
 }
 
 func (c *GlobalConfig) isCategory(category string) bool {
