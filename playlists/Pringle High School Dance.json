@@ -3,7 +3,7 @@
     "playlist2_name": "Pringle All Songs",
     "set_public": true,
     "use_explicit": false,
-    "operation": 0,
+    "operation": "intersection",
     "description": "Camp appropriate version of \"Songs that play at the high school dance when the male protagonist sees the girl walk in slow motion\"",
     "image": "high_school_dance.jpg"
 }

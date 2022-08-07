@@ -3,7 +3,7 @@
     "playlist2_name": "All Songs",
     "set_public": false,
     "use_explicit": true,
-    "operation": 2,
+    "operation": "difference",
     "description": "Songs that I need to sort into \"All Songs\", \"Energetic\", \"Not Camp Appropriate\", and \"Pringle All Songs\"",
     "image": "",
     "only_new_songs": false,

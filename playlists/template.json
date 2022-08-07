@@ -1,7 +1,7 @@
 {
     "playlist1_name": "",
     "playlist2_name": "",
-    "operation": 0,
+    "operation": "intersection",
     "set_public": false,
     "use_explicit": true,
     "description": "",

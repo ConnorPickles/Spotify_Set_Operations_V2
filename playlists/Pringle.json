@@ -3,7 +3,7 @@
     "playlist2_name": "Pringle All Songs",
     "set_public": true,
     "use_explicit": false,
-    "operation": 0,
+    "operation": "intersection",
     "description": "Camp appropriate version of ",
     "image": ""
 }

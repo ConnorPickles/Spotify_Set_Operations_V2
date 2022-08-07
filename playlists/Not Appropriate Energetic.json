@@ -3,7 +3,7 @@
     "playlist2_name": "Pringle Energetic",
     "set_public": false,
     "use_explicit": true,
-    "operation": 2,
+    "operation": "difference",
     "description": "All songs from \"Energetic\" that aren't camp appropriate",
     "image": ""
 }

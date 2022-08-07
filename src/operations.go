@@ -7,12 +7,12 @@ import (
 	"github.com/zmb3/spotify/v2"
 )
 
-type Operation int
+type Operation string
 
 const (
-	Intersection Operation = iota
-	Union
-	Difference
+	Intersection Operation = "intersection"
+	Union = "union"
+	Difference = "difference"
 )
 
 

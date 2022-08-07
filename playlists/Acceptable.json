@@ -3,7 +3,7 @@
     "playlist2_name": "Not Camp Appropriate",
     "set_public": false,
     "use_explicit": true,
-    "operation": 1,
+    "operation": "union",
     "description": "All the songs that I think other people would want to listen to",
     "image": "thumbs_up.jpeg"
 }
