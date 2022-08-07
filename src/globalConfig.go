@@ -25,6 +25,8 @@ func init() {
 		logFatalAndAlert(err)
 	}
 	
+	// exclude some files by default
+	globalConfig.ExcludeFromAll = append(globalConfig.ExcludeFromAll, "images")
 	for _, category := range globalConfig.Categories {
 		globalConfig.ExcludeFromAll = append(globalConfig.ExcludeFromAll, category + ".json")
 	}
