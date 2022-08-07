@@ -59,8 +59,14 @@ func main() {
 
 func operateOnPlaylist(client *spotify.Client, playlistConfig PlaylistConfig, userID string, playlistName string, createNew bool) {
 	allPlaylists := getAllPlaylists(client, userID)
-	playlistID1 := getPlaylistIDFromName(allPlaylists, playlistConfig.Playlist1Name)
-	playlistID2 := getPlaylistIDFromName(allPlaylists, playlistConfig.Playlist2Name)
+	playlistID1, err := getPlaylistIDFromName(allPlaylists, playlistConfig.Playlist1Name)
+	if err != nil {
+		logFatalAndAlert(err)
+	}
+	playlistID2, err := getPlaylistIDFromName(allPlaylists, playlistConfig.Playlist2Name)
+	if err != nil {
+		logFatalAndAlert(err)
+	}
 	tracks1 := getTracks(client, playlistID1)
 	tracks2 := getTracks(client, playlistID2)
 	
@@ -72,9 +78,24 @@ func operateOnPlaylist(client *spotify.Client, playlistConfig PlaylistConfig, us
 		setPlaylistImage(client, playlist, playlistConfig.Image)
 		tracksToAdd, tracksToRemove = executeOperation(playlistConfig, nil, tracks1, tracks2)
 	} else {
-		playlist = getPlaylistIDFromName(allPlaylists, playlistName)
-		existingTracks := getTracks(client, playlist)
-		tracksToAdd, tracksToRemove = executeOperation(playlistConfig, existingTracks, tracks1, tracks2)
+		playlist, err = getPlaylistIDFromName(allPlaylists, playlistName)
+		if err != nil && playlistConfig.CreateOnUpdate {
+			// Create new playlist if it doesn't exist
+			playlist = createNewPlaylist(client, playlistConfig, userID, playlistName)
+			setPlaylistImage(client, playlist, playlistConfig.Image)
+			tracksToAdd, tracksToRemove = executeOperation(playlistConfig, nil, tracks1, tracks2)
+		} else if err != nil {
+			logFatalAndAlert(err)
+		} else {
+			// Update existing playlist
+			existingTracks := getTracks(client, playlist)
+			tracksToAdd, tracksToRemove = executeOperation(playlistConfig, existingTracks, tracks1, tracks2)
+			
+			if (playlistConfig.DeleteIfEmpty && (len(existingTracks) + len(tracksToAdd) - len(tracksToRemove)) == 0) {
+				deletePlaylist(client, playlist)
+				return
+			}
+		}
 	}
 	
 	addTracksToPlaylist(client, playlist, tracksToAdd)

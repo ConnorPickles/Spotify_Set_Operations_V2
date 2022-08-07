@@ -6,5 +6,7 @@
     "operation": 0,
     "description": "",
     "image": "",
-    "only_new_songs": false
+    "only_new_songs": false,
+    "create_on_update": false,
+    "delete_if_empty": false
 }

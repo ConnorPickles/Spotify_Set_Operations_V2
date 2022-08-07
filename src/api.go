@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/zmb3/spotify/v2"
@@ -148,22 +149,28 @@ func removeTracksFromPlaylist(client *spotify.Client, playlistID spotify.ID, tra
 	}
 }
 
+func deletePlaylist(client *spotify.Client, playlistID spotify.ID) {
+	err := client.UnfollowPlaylist(context.Background(), playlistID)
+	if err != nil {
+		logFatalAndAlert(err)
+	}
+}
+
 
 // helper functions
 // --------------------------------------------------------------------------------------------------------------------
 
-func getPlaylistIDFromName(playlists []spotify.SimplePlaylist, playlistName string) spotify.ID {
+func getPlaylistIDFromName(playlists []spotify.SimplePlaylist, playlistName string) (spotify.ID, error) {
 	if playlistName == "Liked Songs" {
-		return "Liked Songs"
+		return "Liked Songs", nil
 	}
 	
 	for _, playlist := range playlists {
 		if playlist.Name == playlistName {
-			return playlist.ID
+			return playlist.ID, nil
 		}
 	}
-	logFatalAndAlert("Could not find playlist " + playlistName)
-	return ""
+	return "", fmt.Errorf("Could not find playlist %s", playlistName)
 }
 
 func convertToTrackIDs(tracks []spotify.SimpleTrack) []spotify.ID {
