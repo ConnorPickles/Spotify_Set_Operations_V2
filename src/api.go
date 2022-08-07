@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/zmb3/spotify/v2"
@@ -34,6 +35,10 @@ func getAllPlaylists(client *spotify.Client, userID string) []spotify.SimplePlay
 
 
 func getTracks(client *spotify.Client, playlistID spotify.ID) []spotify.SimpleTrack {
+	if playlistID == "Liked Songs" {
+		return getSavedTracks(client)	
+	}
+	
 	var results []spotify.PlaylistItem
 	tracks, err := client.GetPlaylistItems(context.Background(), playlistID)
 	if err != nil {
@@ -52,7 +57,30 @@ func getTracks(client *spotify.Client, playlistID spotify.ID) []spotify.SimpleTr
 		results = append(results, tracks.Items...)
 	}
 	
-	return convertToSimpleTracks(results)
+	return convertPlaylistItemsToSimpleTracks(results)
+}
+
+func getSavedTracks(client *spotify.Client) []spotify.SimpleTrack {
+	var results []spotify.SavedTrack
+	tracks, err := client.CurrentUsersTracks(context.Background())
+	if err != nil {
+		logFatalAndAlert(err)
+	}
+	results = append(results, tracks.Tracks...)
+	
+	for {
+		err = client.NextPage(context.Background(), tracks)
+		if err == spotify.ErrNoMorePages {
+			break
+		}
+		if err != nil {
+			logFatalAndAlert(err)
+		}
+		results = append(results, tracks.Tracks...)
+	}
+	
+	fmt.Printf("%d tracks found\n", len(results))
+	return convertSavedTracksToSimpleTracks(results)
 }
 
 func createNewPlaylist(client *spotify.Client, playlistConfig PlaylistConfig, userID string, playlistName string) spotify.ID {
@@ -127,6 +155,10 @@ func removeTracksFromPlaylist(client *spotify.Client, playlistID spotify.ID, tra
 // --------------------------------------------------------------------------------------------------------------------
 
 func getPlaylistIDFromName(playlists []spotify.SimplePlaylist, playlistName string) spotify.ID {
+	if playlistName == "Liked Songs" {
+		return "Liked Songs"
+	}
+	
 	for _, playlist := range playlists {
 		if playlist.Name == playlistName {
 			return playlist.ID
@@ -136,10 +168,18 @@ func getPlaylistIDFromName(playlists []spotify.SimplePlaylist, playlistName stri
 	return ""
 }
 
-func convertToSimpleTracks(tracks []spotify.PlaylistItem) []spotify.SimpleTrack {
+func convertPlaylistItemsToSimpleTracks(tracks []spotify.PlaylistItem) []spotify.SimpleTrack {
 	converted := []spotify.SimpleTrack{}
 	for _, track := range tracks {
 		converted = append(converted, track.Track.Track.SimpleTrack)
+	}
+	return converted
+}
+
+func convertSavedTracksToSimpleTracks(tracks []spotify.SavedTrack) []spotify.SimpleTrack {
+	converted := []spotify.SimpleTrack{}
+	for _, track := range tracks {
+		converted = append(converted, track.FullTrack.SimpleTrack)
 	}
 	return converted
 }

@@ -13,8 +13,18 @@ import (
 
 func main() {
 	if len(os.Args) < 3 {
-		fmt.Println("Usage: spotify_set_operations [update|create] [all|<playlist_name>]")
-		return
+		printUsageAndExit()
+	}
+	if os.Args[1] != "update" && os.Args[1] != "create" {
+		printUsageAndExit()
+	}
+	var createNew bool
+	if os.Args[1] == "create" {
+		createNew = true
+	} else if os.Args[1] == "update" {
+		createNew = false
+	} else {
+		printUsageAndExit()
 	}
 
 	client := authenticate()
@@ -23,22 +33,31 @@ func main() {
 		logFatalAndAlert(err)
 	}
 	
-	createPlaylist(client, user.ID, os.Args[2])
+	if os.Args[2] != "all" {
+		var playlistConfig PlaylistConfig
+		playlistName := os.Args[2]
+		if os.Args[2] == "Pringle" {
+			if (len(os.Args) != 4) {
+				printPringleUsageAndExit()
+			}
+			playlistConfig = createPringleConfig(os.Args[3])
+			playlistName += " " + os.Args[3]
+		} else {
+			playlistConfig = loadPlaylistConfig(os.Args[2])
+		}
+		
+		operateOnPlaylist(client, playlistConfig, user.ID, playlistName, createNew)
+		return
+	}
+	
+	allPlaylistConfigs, allPlaylistNames := loadAllPlaylistConfigs()
+	for i, playlistConfig := range allPlaylistConfigs {
+		fmt.Printf("Working on \"%s\"...\n", allPlaylistNames[i])
+		operateOnPlaylist(client, playlistConfig, user.ID, allPlaylistNames[i], createNew)
+	}
 }
 
-func createPlaylist(client *spotify.Client, userID string, playlistName string) {
-	var playlistConfig PlaylistConfig
-	if os.Args[2] == "Pringle" {
-		if (len(os.Args) < 4) {
-			fmt.Println("Usage: spotify_set_operations [update|create] Pringle <playlist_name>")
-			os.Exit(1)
-		}
-		playlistConfig = createPringleConfig(os.Args[3])
-		playlistName = "Pringle " + os.Args[3]
-	} else {
-		playlistConfig = loadPlaylistConfig(playlistName)
-	}
-		
+func operateOnPlaylist(client *spotify.Client, playlistConfig PlaylistConfig, userID string, playlistName string, createNew bool) {
 	allPlaylists := getAllPlaylists(client, userID)
 	playlistID1 := getPlaylistIDFromName(allPlaylists, playlistConfig.Playlist1Name)
 	playlistID2 := getPlaylistIDFromName(allPlaylists, playlistConfig.Playlist2Name)
@@ -48,16 +67,15 @@ func createPlaylist(client *spotify.Client, userID string, playlistName string) 
 	var tracksToAdd []spotify.SimpleTrack
 	var tracksToRemove []spotify.SimpleTrack
 	var playlist spotify.ID
-	if os.Args[1] == "update" {
-		playlist = getPlaylistIDFromName(allPlaylists, playlistName)
-		existingTracks := getTracks(client, playlist)
-		tracksToAdd, tracksToRemove = executeOperation(playlistConfig.Operation, existingTracks, tracks1, tracks2, playlistConfig.UseExplicit)
-	} else {
+	if createNew {
 		playlist = createNewPlaylist(client, playlistConfig, userID, playlistName)
 		setPlaylistImage(client, playlist, playlistConfig.Image)
 		tracksToAdd, tracksToRemove = executeOperation(playlistConfig.Operation, nil, tracks1, tracks2, playlistConfig.UseExplicit)
+	} else {
+		playlist = getPlaylistIDFromName(allPlaylists, playlistName)
+		existingTracks := getTracks(client, playlist)
+		tracksToAdd, tracksToRemove = executeOperation(playlistConfig.Operation, existingTracks, tracks1, tracks2, playlistConfig.UseExplicit)
 	}
-	// check for something that isn't update or create
 	
 	addTracksToPlaylist(client, playlist, tracksToAdd)
 	removeTracksFromPlaylist(client, playlist, tracksToRemove)
@@ -66,4 +84,14 @@ func createPlaylist(client *spotify.Client, userID string, playlistName string) 
 func logFatalAndAlert(v ...any) {
 	beeep.Alert("Spotify Set Operations", fmt.Sprint(v...), "")
 	log.Fatal(v...)
+}
+
+func printUsageAndExit() {
+	fmt.Println("Usage: spotify_set_operations [update|create] [all|<playlist_name>]")
+	os.Exit(1)
+}
+
+func printPringleUsageAndExit() {
+	fmt.Println("Usage: spotify_set_operations [update|create] Pringle <playlist_name>")
+	os.Exit(1)
 }

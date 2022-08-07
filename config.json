@@ -4,10 +4,11 @@
         "I Love It (feat. Charli XCX)"
     ],
     "update_order": [
-        "Acceptable",
-        "Pringle Energetic"
+        "Acceptable.json",
+        "Pringle Energetic.json"
     ],
     "exclude_from_all": [
+        "images",
         "template.json",
         "Pringle.json"
     ]

@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
 )
 
 type PlaylistConfig struct {
@@ -55,4 +57,32 @@ func (playlistConfig *PlaylistConfig) setDescriptionFromOperation() {
 		case Difference:
 			playlistConfig.Description += fmt.Sprintf("\"%s\" but not \"%s\"", playlistConfig.Playlist1Name, playlistConfig.Playlist2Name)
 	}
+}
+
+func loadAllPlaylistConfigs() (playlistConfigs []PlaylistConfig, playlistNames []string) {
+	files, err := os.ReadDir("playlists")
+	if err != nil {
+		logFatalAndAlert(err)
+	}
+	
+	for _, priority := range globalConfig.UpdateOrder {
+		for _, file := range files {
+			if file.Name() == priority {
+				name := strings.TrimSuffix(file.Name(), filepath.Ext(file.Name()))
+				playlistConfigs = append(playlistConfigs, loadPlaylistConfig(name))
+				playlistNames = append(playlistNames, name)
+				break
+			}
+		}
+	}
+	
+	for _, file := range files {
+		if globalConfig.isExcludedFromAll(file.Name()) || globalConfig.isPriority(file.Name()) {
+			continue
+		}
+		name := strings.TrimSuffix(file.Name(), filepath.Ext(file.Name()))
+		playlistConfigs = append(playlistConfigs, loadPlaylistConfig(name))
+		playlistNames = append(playlistNames, name)
+	}
+	return playlistConfigs, playlistNames
 }

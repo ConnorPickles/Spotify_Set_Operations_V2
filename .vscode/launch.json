@@ -12,7 +12,7 @@
             "program": "${fileDirname}",
             "args": [
                 "update",
-                "Pringle Power Ballads",
+                "all",
             ],
             "cwd": "${workspaceFolder}",
         }

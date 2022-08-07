@@ -24,3 +24,21 @@ func init() {
 		logFatalAndAlert(err)
 	}
 }
+
+func (*GlobalConfig) isExcludedFromAll(configFile string) bool {
+	for _, excludedSong := range globalConfig.ExcludeFromAll {
+		if configFile == excludedSong {
+			return true
+		}
+	}
+	return false
+}
+
+func (*GlobalConfig) isPriority(configFile string) bool {
+	for _, priority := range globalConfig.UpdateOrder {
+		if configFile == priority {
+			return true
+		}
+	}
+	return false
+}
