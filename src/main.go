@@ -109,8 +109,8 @@ func logFatalAndAlert(v ...any) {
 
 func printUsageAndExit() {
 	fmt.Println("\nUSAGE:")
-	fmt.Println("spotify_set_operations [update|create] [all|<playlist_name>]")
+	fmt.Println("spotify_set_operations.exe [update|create] [all|<playlist_name>]")
 	fmt.Println("OR")
-	fmt.Println("spotify_set_operations [update|create] <category> <playlist_name>")
+	fmt.Println("spotify_set_operations.exe [update|create] <category> <playlist_name>\n")
 	os.Exit(1)
 }
