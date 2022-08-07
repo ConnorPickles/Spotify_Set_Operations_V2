@@ -2,6 +2,7 @@ package main
 
 import (
 	"strings"
+	"time"
 
 	"github.com/zmb3/spotify/v2"
 )
@@ -15,19 +16,33 @@ const (
 )
 
 
-func executeOperation(operation Operation, existingTracks, playlist1, playlist2 []spotify.SimpleTrack, explicit bool) (add, remove []spotify.SimpleTrack) {
-	var op_result []spotify.SimpleTrack
-	switch operation {
-		case Intersection:
-			op_result = intersection(playlist1, playlist2, explicit)
-		case Union:
-			op_result = union(playlist1, playlist2, explicit)
-		case Difference:
-			op_result = difference(playlist1, playlist2)
+func executeOperation(playlistConfig PlaylistConfig, existingTracks, playlist1, playlist2 []Track) (add, remove []spotify.SimpleTrack) {
+	if playlistConfig.OnlyNewSongs {
+		var moreRecentOldestTime time.Time
+		if oldest1, oldest2 := oldestAddedAt(playlist1), oldestAddedAt(playlist2); oldest1.After(oldest2) {
+			moreRecentOldestTime = oldest1
+		} else {
+			moreRecentOldestTime = oldest2
+		}
+		
+		playlist1 = removeSongsOlderThan(playlist1, moreRecentOldestTime)
+		playlist2 = removeSongsOlderThan(playlist2, moreRecentOldestTime)
 	}
 	
-	add = difference(op_result, existingTracks)
-	remove = difference(existingTracks, op_result)
+	var op_result []spotify.SimpleTrack
+	opPlaylist1 := Tracks(playlist1).toSimpleTracks()
+	opPlaylist2 := Tracks(playlist2).toSimpleTracks()
+	switch playlistConfig.Operation {
+		case Intersection:
+			op_result = intersection(opPlaylist1, opPlaylist2, playlistConfig.UseExplicit)
+		case Union:
+			op_result = union(opPlaylist1, opPlaylist2, playlistConfig.UseExplicit)
+		case Difference:
+			op_result = difference(opPlaylist1, opPlaylist2)
+	}
+	
+	add = difference(op_result, Tracks(existingTracks).toSimpleTracks())
+	remove = difference(Tracks(existingTracks).toSimpleTracks(), op_result)
 	return add, remove
 }
 

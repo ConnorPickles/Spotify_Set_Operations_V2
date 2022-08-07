@@ -13,9 +13,12 @@ type PlaylistConfig struct {
 	Playlist2Name string    `json:"playlist2_name"`
 	SetPublic     bool      `json:"set_public"`
 	UseExplicit   bool      `json:"use_explicit"`
+	// Set operation to perform on the two playlists
 	Operation     Operation `json:"operation"`
 	Description   string    `json:"description"`
 	Image         string    `json:"image"`
+	// Look at oldest song from each playlist, and only consider songs that were added after the more recent 'oldest' of the two playlists
+	OnlyNewSongs  bool	    `json:"only_new_songs"`
 }
 
 func loadPlaylistConfig(playlistName string) PlaylistConfig {

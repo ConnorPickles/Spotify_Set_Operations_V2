@@ -1,0 +1,10 @@
+{
+    "playlist1_name": "Liked Songs",
+    "playlist2_name": "New",
+    "set_public": false,
+    "use_explicit": true,
+    "operation": 1,
+    "description": "Songs that I've recently added to my library",
+    "image": "",
+    "only_new_songs": true
+}

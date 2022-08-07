@@ -70,11 +70,11 @@ func operateOnPlaylist(client *spotify.Client, playlistConfig PlaylistConfig, us
 	if createNew {
 		playlist = createNewPlaylist(client, playlistConfig, userID, playlistName)
 		setPlaylistImage(client, playlist, playlistConfig.Image)
-		tracksToAdd, tracksToRemove = executeOperation(playlistConfig.Operation, nil, tracks1, tracks2, playlistConfig.UseExplicit)
+		tracksToAdd, tracksToRemove = executeOperation(playlistConfig, nil, tracks1, tracks2)
 	} else {
 		playlist = getPlaylistIDFromName(allPlaylists, playlistName)
 		existingTracks := getTracks(client, playlist)
-		tracksToAdd, tracksToRemove = executeOperation(playlistConfig.Operation, existingTracks, tracks1, tracks2, playlistConfig.UseExplicit)
+		tracksToAdd, tracksToRemove = executeOperation(playlistConfig, existingTracks, tracks1, tracks2)
 	}
 	
 	addTracksToPlaylist(client, playlist, tracksToAdd)

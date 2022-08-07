@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 
 	"github.com/zmb3/spotify/v2"
@@ -34,7 +33,7 @@ func getAllPlaylists(client *spotify.Client, userID string) []spotify.SimplePlay
 }
 
 
-func getTracks(client *spotify.Client, playlistID spotify.ID) []spotify.SimpleTrack {
+func getTracks(client *spotify.Client, playlistID spotify.ID) []Track {
 	if playlistID == "Liked Songs" {
 		return getSavedTracks(client)	
 	}
@@ -57,10 +56,10 @@ func getTracks(client *spotify.Client, playlistID spotify.ID) []spotify.SimpleTr
 		results = append(results, tracks.Items...)
 	}
 	
-	return convertPlaylistItemsToSimpleTracks(results)
+	return PlaylistItems(results).toTracks()
 }
 
-func getSavedTracks(client *spotify.Client) []spotify.SimpleTrack {
+func getSavedTracks(client *spotify.Client) []Track {
 	var results []spotify.SavedTrack
 	tracks, err := client.CurrentUsersTracks(context.Background())
 	if err != nil {
@@ -79,8 +78,7 @@ func getSavedTracks(client *spotify.Client) []spotify.SimpleTrack {
 		results = append(results, tracks.Tracks...)
 	}
 	
-	fmt.Printf("%d tracks found\n", len(results))
-	return convertSavedTracksToSimpleTracks(results)
+	return SavedTracks(results).toTracks()
 }
 
 func createNewPlaylist(client *spotify.Client, playlistConfig PlaylistConfig, userID string, playlistName string) spotify.ID {
@@ -166,22 +164,6 @@ func getPlaylistIDFromName(playlists []spotify.SimplePlaylist, playlistName stri
 	}
 	logFatalAndAlert("Could not find playlist " + playlistName)
 	return ""
-}
-
-func convertPlaylistItemsToSimpleTracks(tracks []spotify.PlaylistItem) []spotify.SimpleTrack {
-	converted := []spotify.SimpleTrack{}
-	for _, track := range tracks {
-		converted = append(converted, track.Track.Track.SimpleTrack)
-	}
-	return converted
-}
-
-func convertSavedTracksToSimpleTracks(tracks []spotify.SavedTrack) []spotify.SimpleTrack {
-	converted := []spotify.SimpleTrack{}
-	for _, track := range tracks {
-		converted = append(converted, track.FullTrack.SimpleTrack)
-	}
-	return converted
 }
 
 func convertToTrackIDs(tracks []spotify.SimpleTrack) []spotify.ID {

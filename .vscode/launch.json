@@ -12,7 +12,7 @@
             "program": "${fileDirname}",
             "args": [
                 "update",
-                "all",
+                "New",
             ],
             "cwd": "${workspaceFolder}",
         }
