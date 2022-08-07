@@ -96,7 +96,7 @@ func completeAuth(w http.ResponseWriter, r *http.Request) {
 	}
 	if st := r.FormValue("state"); st != state {
 		http.NotFound(w, r)
-		logFatalAndAlert("State mismatch: %s != %s\n", st, state)
+		logFatalAndAlert(fmt.Sprintf("State mismatch: %s != %s\n", st, state))
 	}
 
 	// use the token to get an authenticated client

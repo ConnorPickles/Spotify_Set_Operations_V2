@@ -81,6 +81,10 @@ func setPlaylistImage(client *spotify.Client, playlist spotify.ID, image string)
 }
 
 func addTracksToPlaylist(client *spotify.Client, playlistID spotify.ID, tracks []spotify.SimpleTrack) {
+	if len(tracks) == 0 {
+		return
+	}
+	
 	convertedTracks := convertToTrackIDs(tracks)
 	for i := 0; i < len(tracks); i += 100 {
 		var currTracks []spotify.ID
@@ -91,6 +95,27 @@ func addTracksToPlaylist(client *spotify.Client, playlistID spotify.ID, tracks [
 		}
 		
 		_, err := client.AddTracksToPlaylist(context.Background(), playlistID, currTracks...)
+		if err != nil {
+			logFatalAndAlert(err)
+		}
+	}
+}
+
+func removeTracksFromPlaylist(client *spotify.Client, playlistID spotify.ID, tracks []spotify.SimpleTrack) {
+	if len(tracks) == 0 {
+		return
+	}
+	
+	convertedTracks := convertToTrackIDs(tracks)
+	for i := 0; i < len(tracks); i += 100 {
+		var currTracks []spotify.ID
+		if i + 100 > len(tracks) {
+			currTracks = convertedTracks[i:]
+		} else {
+			currTracks = convertedTracks[i:i+100]
+		}
+		
+		_, err := client.RemoveTracksFromPlaylist(context.Background(), playlistID, currTracks...)
 		if err != nil {
 			logFatalAndAlert(err)
 		}

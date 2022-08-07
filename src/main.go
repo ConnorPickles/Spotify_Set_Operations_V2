@@ -44,11 +44,23 @@ func createPlaylist(client *spotify.Client, userID string, playlistName string) 
 	playlistID2 := getPlaylistIDFromName(allPlaylists, playlistConfig.Playlist2Name)
 	tracks1 := getTracks(client, playlistID1)
 	tracks2 := getTracks(client, playlistID2)
-	tracksToAdd := executeOperation(playlistConfig.Operation, nil, tracks1, tracks2, playlistConfig.UseExplicit)
 	
-	playlist := createNewPlaylist(client, playlistConfig, userID, playlistName)
-	setPlaylistImage(client, playlist, playlistConfig.Image)
+	var tracksToAdd []spotify.SimpleTrack
+	var tracksToRemove []spotify.SimpleTrack
+	var playlist spotify.ID
+	if os.Args[1] == "update" {
+		playlist = getPlaylistIDFromName(allPlaylists, playlistName)
+		existingTracks := getTracks(client, playlist)
+		tracksToAdd, tracksToRemove = executeOperation(playlistConfig.Operation, existingTracks, tracks1, tracks2, playlistConfig.UseExplicit)
+	} else {
+		playlist = createNewPlaylist(client, playlistConfig, userID, playlistName)
+		setPlaylistImage(client, playlist, playlistConfig.Image)
+		tracksToAdd, tracksToRemove = executeOperation(playlistConfig.Operation, nil, tracks1, tracks2, playlistConfig.UseExplicit)
+	}
+	// check for something that isn't update or create
+	
 	addTracksToPlaylist(client, playlist, tracksToAdd)
+	removeTracksFromPlaylist(client, playlist, tracksToRemove)
 }
 
 func logFatalAndAlert(v ...any) {

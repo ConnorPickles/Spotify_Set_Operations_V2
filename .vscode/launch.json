@@ -11,7 +11,7 @@
             "mode": "auto",
             "program": "${fileDirname}",
             "args": [
-                "create",
+                "update",
                 "Pringle Power Ballads",
             ],
             "cwd": "${workspaceFolder}",

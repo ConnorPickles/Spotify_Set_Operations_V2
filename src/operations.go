@@ -15,17 +15,20 @@ const (
 )
 
 
-func executeOperation(operation Operation, existingTracks, playlist1, playlist2 []spotify.SimpleTrack, explicit bool) []spotify.SimpleTrack {
-	var result []spotify.SimpleTrack
+func executeOperation(operation Operation, existingTracks, playlist1, playlist2 []spotify.SimpleTrack, explicit bool) (add, remove []spotify.SimpleTrack) {
+	var op_result []spotify.SimpleTrack
 	switch operation {
 		case Intersection:
-			result = intersection(playlist1, playlist2, explicit)
+			op_result = intersection(playlist1, playlist2, explicit)
 		case Union:
-			result = union(playlist1, playlist2, explicit)
+			op_result = union(playlist1, playlist2, explicit)
 		case Difference:
-			result = difference(playlist1, playlist2)
+			op_result = difference(playlist1, playlist2)
 	}
-	return difference(result, existingTracks)
+	
+	add = difference(op_result, existingTracks)
+	remove = difference(existingTracks, op_result)
+	return add, remove
 }
 
 func intersection(playlist1, playlist2 []spotify.SimpleTrack, explicit bool) []spotify.SimpleTrack {
