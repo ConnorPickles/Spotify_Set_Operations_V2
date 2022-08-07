@@ -36,11 +36,11 @@ func main() {
 	if os.Args[2] != "all" {
 		var playlistConfig PlaylistConfig
 		playlistName := os.Args[2]
-		if os.Args[2] == "Pringle" {
+		if globalConfig.isCategory(playlistName) {
 			if (len(os.Args) != 4) {
-				printPringleUsageAndExit()
+				printUsageAndExit()
 			}
-			playlistConfig = createPringleConfig(os.Args[3])
+			playlistConfig = createCategoryConfig(os.Args[3], playlistName)
 			playlistName += " " + os.Args[3]
 		} else {
 			playlistConfig = loadPlaylistConfig(os.Args[2])
@@ -108,11 +108,9 @@ func logFatalAndAlert(v ...any) {
 }
 
 func printUsageAndExit() {
-	fmt.Println("Usage: spotify_set_operations [update|create] [all|<playlist_name>]")
-	os.Exit(1)
-}
-
-func printPringleUsageAndExit() {
-	fmt.Println("Usage: spotify_set_operations [update|create] Pringle <playlist_name>")
+	fmt.Println("\nUSAGE:")
+	fmt.Println("spotify_set_operations [update|create] [all|<playlist_name>]")
+	fmt.Println("OR")
+	fmt.Println("spotify_set_operations [update|create] <category> <playlist_name>")
 	os.Exit(1)
 }

@@ -6,6 +6,7 @@ import (
 )
 
 type GlobalConfig struct {
+	Categories []string `json:"categories"`
 	DuplicateSongs []string `json:"duplicate_songs"`
 	UpdateOrder []string `json:"update_order"`
 	ExcludeFromAll []string `json:"exclude_from_all"`
@@ -25,8 +26,17 @@ func init() {
 	}
 }
 
-func (*GlobalConfig) isExcludedFromAll(configFile string) bool {
-	for _, excludedSong := range globalConfig.ExcludeFromAll {
+func (c *GlobalConfig) isCategory(category string) bool {
+	for _, c := range c.Categories {
+		if c == category {
+			return true
+		}
+	}
+	return false
+}
+
+func (c *GlobalConfig) isExcludedFromAll(configFile string) bool {
+	for _, excludedSong := range c.ExcludeFromAll {
 		if configFile == excludedSong {
 			return true
 		}
@@ -34,8 +44,8 @@ func (*GlobalConfig) isExcludedFromAll(configFile string) bool {
 	return false
 }
 
-func (*GlobalConfig) isPriority(configFile string) bool {
-	for _, priority := range globalConfig.UpdateOrder {
+func (c *GlobalConfig) isPriority(configFile string) bool {
+	for _, priority := range c.UpdateOrder {
 		if configFile == priority {
 			return true
 		}

@@ -42,8 +42,8 @@ func loadPlaylistConfig(playlistName string) PlaylistConfig {
 	return playlistConfig
 }
 
-func createPringleConfig(playlistName string) PlaylistConfig {
-	playlistConfig := loadPlaylistConfig("Pringle")
+func createCategoryConfig(playlistName, category string) PlaylistConfig {
+	playlistConfig := loadPlaylistConfig(category)
 	playlistConfig.Playlist1Name = playlistName
 	playlistConfig.Description += "\"" + playlistName + "\""
 	return playlistConfig
