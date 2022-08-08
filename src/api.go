@@ -170,7 +170,7 @@ func getPlaylistIDFromName(playlists []spotify.SimplePlaylist, playlistName stri
 			return playlist.ID, nil
 		}
 	}
-	return "", fmt.Errorf("Could not find playlist %s", playlistName)
+	return "", fmt.Errorf("could not find playlist %s", playlistName)
 }
 
 func convertToTrackIDs(tracks []spotify.SimpleTrack) []spotify.ID {

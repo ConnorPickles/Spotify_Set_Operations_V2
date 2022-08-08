@@ -11,8 +11,8 @@ type Operation string
 
 const (
 	Intersection Operation = "intersection"
-	Union = "union"
-	Difference = "difference"
+	Union Operation = "union"
+	Difference Operation = "difference"
 )
 
 

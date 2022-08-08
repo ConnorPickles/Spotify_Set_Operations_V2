@@ -70,36 +70,33 @@ func operateOnPlaylist(client *spotify.Client, playlistConfig PlaylistConfig, us
 	tracks1 := getTracks(client, playlistID1)
 	tracks2 := getTracks(client, playlistID2)
 	
-	var tracksToAdd []spotify.SimpleTrack
-	var tracksToRemove []spotify.SimpleTrack
-	var playlist spotify.ID
-	if createNew {
-		playlist = createNewPlaylist(client, playlistConfig, userID, playlistName)
-		setPlaylistImage(client, playlist, playlistConfig.Image)
-		tracksToAdd, tracksToRemove = executeOperation(playlistConfig, nil, tracks1, tracks2)
-	} else {
-		playlist, err = getPlaylistIDFromName(allPlaylists, playlistName)
-		if err != nil && playlistConfig.CreateOnUpdate {
-			// Create new playlist if it doesn't exist
-			playlist = createNewPlaylist(client, playlistConfig, userID, playlistName)
-			setPlaylistImage(client, playlist, playlistConfig.Image)
-			tracksToAdd, tracksToRemove = executeOperation(playlistConfig, nil, tracks1, tracks2)
-		} else if err != nil {
-			logFatalAndAlert(err)
-		} else {
-			// Update existing playlist
-			existingTracks := getTracks(client, playlist)
-			tracksToAdd, tracksToRemove = executeOperation(playlistConfig, existingTracks, tracks1, tracks2)
-			
-			if (playlistConfig.DeleteIfEmpty && (len(existingTracks) + len(tracksToAdd) - len(tracksToRemove)) == 0) {
-				deletePlaylist(client, playlist)
-				return
-			}
-		}
-	}
+	// doesn't need to be in an if statement because it will get overwritten if a new playlistID is created anyway
+	playlistID, err := getPlaylistIDFromName(allPlaylists, playlistName)
 	
-	addTracksToPlaylist(client, playlist, tracksToAdd)
-	removeTracksFromPlaylist(client, playlist, tracksToRemove)
+	var tracksToAdd []spotify.SimpleTrack
+	if createNew || (err != nil && playlistConfig.CreateOnUpdate) {
+		tracksToAdd, _ = executeOperation(playlistConfig, nil, tracks1, tracks2)
+		if len(tracksToAdd) == 0 && !createNew {
+			// We still want to create a new empty playlist if we've been told to create a playlist.
+			// It's useful when setting up playlists to see that the program did create a playlist,
+			// it just didn't put any tracks in it.
+			return
+		}
+		playlistID = createNewPlaylist(client, playlistConfig, userID, playlistName)
+		setPlaylistImage(client, playlistID, playlistConfig.Image)
+		addTracksToPlaylist(client, playlistID, tracksToAdd)
+	} else {
+		existingTracks := getTracks(client, playlistID)
+		tracksToAdd, tracksToRemove := executeOperation(playlistConfig, existingTracks, tracks1, tracks2)
+		
+		if (playlistConfig.DeleteIfEmpty && (len(existingTracks) + len(tracksToAdd) - len(tracksToRemove)) == 0) {
+			deletePlaylist(client, playlistID)
+			return
+		}
+		
+		addTracksToPlaylist(client, playlistID, tracksToAdd)
+		removeTracksFromPlaylist(client, playlistID, tracksToRemove)
+	}
 }
 
 func logFatalAndAlert(v ...any) {
