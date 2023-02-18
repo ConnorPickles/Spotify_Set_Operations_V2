@@ -13,5 +13,10 @@
     "exclude_from_all": [
         "images",
         "template.json"
+    ],
+    "remove_not_liked": true,
+    "use_not_liked_songs": [
+        "Dance Party 2019",
+        "Pringle Bops and Boys"
     ]
 }

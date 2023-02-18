@@ -10,7 +10,6 @@ import (
 	"github.com/zmb3/spotify/v2"
 )
 
-
 func main() {
 	if len(os.Args) < 3 {
 		printUsageAndExit()
@@ -32,12 +31,12 @@ func main() {
 	if err != nil {
 		logFatalAndAlert(err)
 	}
-	
+
 	if os.Args[2] != "all" {
 		var playlistConfig PlaylistConfig
 		playlistName := os.Args[2]
 		if globalConfig.isCategory(playlistName) {
-			if (len(os.Args) != 4) {
+			if len(os.Args) != 4 {
 				printUsageAndExit()
 			}
 			playlistConfig = createCategoryConfig(os.Args[3], playlistName)
@@ -45,11 +44,15 @@ func main() {
 		} else {
 			playlistConfig = loadPlaylistConfig(os.Args[2])
 		}
-		
+
 		operateOnPlaylist(client, playlistConfig, user.ID, playlistName, createNew)
 		return
 	}
-	
+
+	if globalConfig.RemoveNotLiked {
+		removeNotLiked(client, user.ID)
+	}
+
 	allPlaylistConfigs, allPlaylistNames := loadAllPlaylistConfigs()
 	for i, playlistConfig := range allPlaylistConfigs {
 		fmt.Printf("Working on \"%s\"...\n", allPlaylistNames[i])
@@ -69,10 +72,10 @@ func operateOnPlaylist(client *spotify.Client, playlistConfig PlaylistConfig, us
 	}
 	tracks1 := getTracks(client, playlistID1)
 	tracks2 := getTracks(client, playlistID2)
-	
+
 	// doesn't need to be in an if statement because it will get overwritten if a new playlistID is created anyway
 	playlistID, err := getPlaylistIDFromName(allPlaylists, playlistName)
-	
+
 	var tracksToAdd []spotify.SimpleTrack
 	if createNew || (err != nil && playlistConfig.CreateOnUpdate) {
 		tracksToAdd, _ = executeOperation(playlistConfig, nil, tracks1, tracks2)
@@ -88,14 +91,42 @@ func operateOnPlaylist(client *spotify.Client, playlistConfig PlaylistConfig, us
 	} else {
 		existingTracks := getTracks(client, playlistID)
 		tracksToAdd, tracksToRemove := executeOperation(playlistConfig, existingTracks, tracks1, tracks2)
-		
-		if (playlistConfig.DeleteIfEmpty && (len(existingTracks) + len(tracksToAdd) - len(tracksToRemove)) == 0) {
+
+		if playlistConfig.DeleteIfEmpty && (len(existingTracks)+len(tracksToAdd)-len(tracksToRemove)) == 0 {
 			deletePlaylist(client, playlistID)
 			return
 		}
-		
+
 		addTracksToPlaylist(client, playlistID, tracksToAdd)
 		removeTracksFromPlaylist(client, playlistID, tracksToRemove)
+	}
+}
+
+func removeNotLiked(client *spotify.Client, userID string) {
+	allPlaylists := getAllPlaylists(client, userID)
+	likedSongsID, err := getPlaylistIDFromName(allPlaylists, "Liked Songs")
+	if err != nil {
+		logFatalAndAlert(err)
+	}
+
+	likedTracks := Tracks(getTracks(client, likedSongsID)).toSimpleTracks()
+	for _, playlist := range allPlaylists {
+		if globalConfig.isUsingNotLikedSongs(playlist.Name) {
+			continue
+		}
+		fmt.Printf("Removing un-liked songs from \"%s\"...\n", playlist.Name)
+		tracks := Tracks(getTracks(client, playlist.ID)).toSimpleTracks()
+		var onlyLiked []spotify.SimpleTrack
+		for _, track := range tracks {
+			for _, likedTrack := range likedTracks {
+				if track.ID == likedTrack.ID {
+					onlyLiked = append(onlyLiked, track)
+					break
+				}
+			}
+		}
+		notLiked := difference(tracks, onlyLiked)
+		removeTracksFromPlaylist(client, playlist.ID, notLiked)
 	}
 }
 
