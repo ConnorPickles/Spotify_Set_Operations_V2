@@ -139,6 +139,6 @@ func printUsageAndExit() {
 	fmt.Println("\nUSAGE:")
 	fmt.Println("spotify_set_operations.exe [update|create] [all|<playlist_name>]")
 	fmt.Println("OR")
-	fmt.Println("spotify_set_operations.exe [update|create] <category> <playlist_name>\n")
+	fmt.Println("spotify_set_operations.exe [update|create] <category> <playlist_name>")
 	os.Exit(1)
 }

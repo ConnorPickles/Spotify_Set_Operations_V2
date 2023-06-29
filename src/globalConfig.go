@@ -35,9 +35,7 @@ func init() {
 
 	// generated playlists will have non liked songs removed by playlist updates/creation anyway
 	_, allPlaylistNames := loadAllPlaylistConfigs()
-	for _, playlist := range allPlaylistNames {
-		globalConfig.UseNotLikedSongs = append(globalConfig.UseNotLikedSongs, playlist)
-	}
+	globalConfig.UseNotLikedSongs = append(globalConfig.UseNotLikedSongs, allPlaylistNames...)
 }
 
 func (c *GlobalConfig) isCategory(category string) bool {
