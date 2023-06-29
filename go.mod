@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/gen2brain/beeep v0.0.0-20220518085355-d7852edf42fc
-	github.com/zmb3/spotify/v2 v2.2.1
+	github.com/zmb3/spotify/v2 v2.3.1
 	golang.org/x/oauth2 v0.0.0-20210810183815-faf39c7919d5
 )
 
