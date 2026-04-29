@@ -14,7 +14,7 @@ import (
 	"golang.org/x/oauth2"
 )
 
-const redirectURI = "http://localhost:8888/callback"
+const redirectURI = "http://127.0.0.1:8888/callback"
 
 var (
 	scopes = []string{
